@@ -13,11 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+package cmd
 
-import "github.com/DragonPi/ufw-cidr-autoblock/cmd"
+import (
+	"fmt"
 
-func main() {
-	c := cmd.New()
-	c.Execute()
+	"github.com/spf13/cobra"
+)
+
+func (c* Cmd) addRevertCmd() {
+	c.cmds["revert"] = &cobra.Command{
+		Use:   "revert",
+		Short: "Revert to previous rules",
+		Long:  "This function can be used to quickly return to a previous set of rules in case of breaking functionalities.",
+		Example: "ufw-cidr-autoblock revert",
+		Args: cobra.ExactArgs(0),
+		Run: func(cmd *cobra.Command, args []string) {
+			c.printVersion()
+		},
+	}
+}
+
+// printRevert prints output from the revert function
+func (c *Cmd) printRevert(){
+	fmt.Println("revert called")
 }

@@ -23,61 +23,87 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+// This struct holds the CLI attributes given
+type Cmd struct {
+	Root          *cobra.Command
+	cmds          map[string]*cobra.Command
+	verbose       bool
+	dryRun        bool
+	exclcountries string
+	exclzones     string
+	exclgithub    string
+	inclzones     string
+}
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "ufw-cidr-autoblock",
-	Short: "Generate firewall rules and apply with ufw",
-	Long: `This tool generates firewall rules based on CIDR zone files downloaded from the internet.
+// Instantiate the root CLI
+func New() *Cmd {
+	c := &Cmd{
+		Root: &cobra.Command{
+			Use:   "ufw-cidr-autoblock",
+			Short: "Generate firewall rules and apply with ufw",
+			Long: `This tool generates firewall rules based on CIDR zone files downloaded from the internet.
 By default it will block all known IP-zones. Two config files exist for exclusions.
-- .uca-exclcountry with country zones to exclude (basically what you like to allow)
-- .uca-exclzone with CIDR zones to exclude (basically a subset of CIDR you like to allow)
+- .uca-exclcountry.json with country zones to exclude (basically what you like to allow)
+- .uca-exclzone.json with CIDR zones to exclude (basically a subset of CIDR you like to allow)
 
 CIDR address block lists provided by http://ipverse.net
 
-The .uca-exlzone can be appended automatically with for example:
+The .uca-exclzone.json can be appended automatically with for example:
 - Github webhooks IP zones fetched from https://api.github.com/meta`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+		},
+	}
+
+	c.setup()
+
+	return c
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	cobra.CheckErr(rootCmd.Execute())
+func (c *Cmd) Execute() {
+	c.Root.Execute()
 }
 
-func init() {
-	cobra.OnInitialize(initConfig)
+func (c *Cmd) setup() {
+	c.cmds = make(map[string]*cobra.Command)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	c.initConfig()
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile1, "countries-allow", "", "config file (default is $HOME/.uca-exclcountry)")
-	rootCmd.PersistentFlags().StringVar(&cfgFile2, "zones-allow", "", "config file (default is $HOME/.uca-exclzone)")
+	// Global flags
+	c.Root.PersistentFlags().BoolP("verbose", "v", false, "verbose")
+	// Local flags
+	// c.Root.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	c.addVersionCmd()
+	c.addApplyCmd()
+	c.addRevertCmd()
+
+	// Add root commands
+	// ufw-cidr-autoblock <root-command>
+	for _, ccmd := range c.cmds {
+		c.Root.AddCommand(ccmd)
+	}
+
+	// Set to true for production application.
+	// false enables the bash completion module to generate bash_completion script.
+	// Output needs to be copied to /etc/bash_completion.d/lnx-database-tools
+	c.Root.CompletionOptions.DisableDefaultCmd = true
+	// When set to false additional info is printed for each command during bash_completion
+	c.Root.CompletionOptions.DisableDescriptions = true
 }
 
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
+// initConfig reads in config files and ENV variables if set.
+func (c *Cmd) initConfig() {
+	if c.exclcountries != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
+		viper.SetConfigFile(c.exclcountries)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".ufw-cidr-autoblock" (without extension).
+		// Search config in home directory with name ".uca-exclcountry" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigType("yaml")
-		viper.SetConfigName(".ufw-cidr-autoblock")
+		viper.SetConfigType("json")
+		viper.SetConfigName(".uca-exclcountries")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
