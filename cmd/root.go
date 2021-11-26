@@ -28,13 +28,16 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ufw-cidr-autoblock",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Generate firewall rules and apply with ufw",
+	Long: `This tool generates firewall rules based on CIDR zone files downloaded from the internet.
+By default it will block all known IP-zones. Two config files exist for exclusions.
+- .uca-exclcountry with country zones to exclude (basically what you like to allow)
+- .uca-exclzone with CIDR zones to exclude (basically a subset of CIDR you like to allow)
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+CIDR address block lists provided by http://ipverse.net
+
+The .uca-exlzone can be appended automatically with for example:
+- Github webhooks IP zones fetched from https://api.github.com/meta`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -53,7 +56,8 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ufw-cidr-autoblock.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile1, "countries-allow", "", "config file (default is $HOME/.uca-exclcountry)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile2, "zones-allow", "", "config file (default is $HOME/.uca-exclzone)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
