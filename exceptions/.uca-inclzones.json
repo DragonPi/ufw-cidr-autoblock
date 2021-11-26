@@ -1,0 +1,9 @@
+{
+    "_comment": "This file contains zones that should be explicitly blocked, independent of the downloaded zone files",
+    "manual_entries": [
+
+    ],
+    "automatic_entries":[
+        
+    ]
+}
