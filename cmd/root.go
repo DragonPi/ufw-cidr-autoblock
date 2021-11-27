@@ -27,16 +27,25 @@ import (
 type Cmd struct {
 	Root          *cobra.Command
 	cmds          map[string]*cobra.Command
+	signature     map[string]string
 	verbose       bool
 	dryRun        bool
+	version       string
 	exclcountries string
 	exclzones     string
 	exclgithub    string
 	inclzones     string
 }
 
+// This struct contains the application signature
+type Signature struct {
+	Version    string
+	Buildstamp string
+	Githash    string
+}
+
 // Instantiate the root CLI
-func New() *Cmd {
+func New(s map[string]string) *Cmd {
 	c := &Cmd{
 		Root: &cobra.Command{
 			Use:   "ufw-cidr-autoblock",
@@ -51,6 +60,7 @@ CIDR address block lists provided by http://ipverse.net
 The .uca-exclzone.json can be appended automatically with for example:
 - Github webhooks IP zones fetched from https://api.github.com/meta`,
 		},
+		signature: s,
 	}
 
 	c.setup()

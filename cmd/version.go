@@ -21,13 +21,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c* Cmd) addVersionCmd() {
+func (c *Cmd) addVersionCmd() {
 	c.cmds["version"] = &cobra.Command{
-		Use:   "version",
-		Short: "Display application version",
-		Long:  "This command returns the version.",
+		Use:     "version",
+		Short:   "Display application version",
+		Long:    "This command returns the version.",
 		Example: "lnx-database-tool version",
-		Args: cobra.ExactArgs(0),
+		Args:    cobra.ExactArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			c.printVersion()
 		},
@@ -35,6 +35,8 @@ func (c* Cmd) addVersionCmd() {
 }
 
 // printVersion returns the version of the application
-func (c *Cmd) printVersion(){
-	fmt.Println("version called")
+func (c *Cmd) printVersion() {
+	fmt.Printf("Last build: %s\n", c.signature["Buildstamp"])
+	fmt.Printf("App Version: %s\n", c.signature["Version"])
+	fmt.Printf("Githash: %s\n", c.signature["Githash"])
 }

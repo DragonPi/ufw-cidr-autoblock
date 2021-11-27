@@ -14,3 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 package cmd
+
+// DownloadGithubIP fetches the CIDR zones from the GitHub API, meta endpoint
+func DownloadGitHubIP(zones []string, verbose bool) (cidr []string, err error) {
+
+	//curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/meta
+	//curl -H "Accept: application/vnd.github.v3+json" https://api.github.com/meta | jq .hooks[] | sed 's/"//g' > $PATH_TO_LISTS/.ex.zone
+
+	return
+}
+
+// saveZones saves the downloaded zones files locally
+func saveZones() (err error) {
+
+	return
+}
+
+// appendZones adds CIDR zones to the "automatic_entries" sections of the specified
+func appendZones(jsonFile string, section string, subsection string) (err error) {
+
+	return
+}
