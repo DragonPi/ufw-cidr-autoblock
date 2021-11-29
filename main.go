@@ -17,7 +17,7 @@ package main
 
 import "github.com/DragonPi/ufw-cidr-autoblock/cmd"
 
-// Build the executable with the following command (adapt main.Version as needed)
+// Build the executable with the following command (adapt application_path/cmd.Version as needed)
 // go build -ldflags "-X github.com/DragonPi/ufw-cidr-autoblock/cmd.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` \
 //                    -X github.com/DragonPi/ufw-cidr-autoblock/cmd.Githash=`git rev-parse HEAD` \
 //                    -X github.com/DragonPi/ufw-cidr-autoblock/cmd.Version=0.5"

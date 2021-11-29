@@ -21,12 +21,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// These variables are populated during build (-ldflags -> see main.go)
 var (
 	Version    string
 	Buildstamp string
 	Githash    string
 )
 
+// Struct to hold the application signature so it can be easily used elsewhere
 type Signature struct {
 	Version    string
 	Buildstamp string
