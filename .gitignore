@@ -16,3 +16,6 @@ vendor/
 
 # Production binary, built with `go build`
 ufw-cidr-autoblock
+
+# SQLite database
+*.db

@@ -23,34 +23,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-// This struct holds the CLI attributes given
-type Cmd struct {
-	Root          *cobra.Command
-	cmds          map[string]*cobra.Command
-	signature     map[string]string
-	verbose       bool
-	dryRun        bool
-	version       string
-	exclcountries string
-	exclzones     string
-	exclgithub    string
-	inclzones     string
-}
+var (
+	cfgFile string
+	verbose bool
+)
 
-// This struct contains the application signature
-type Signature struct {
-	Version    string
-	Buildstamp string
-	Githash    string
-}
-
-// Instantiate the root CLI
-func New(s map[string]string) *Cmd {
-	c := &Cmd{
-		Root: &cobra.Command{
-			Use:   "ufw-cidr-autoblock",
-			Short: "Generate firewall rules and apply with ufw",
-			Long: `This tool generates firewall rules based on CIDR zone files downloaded from the internet.
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
+	Use:   "ufw-cidr-autoblock",
+	Short: "Generate firewall rules and apply with ufw",
+	Long: `This tool generates firewall rules based on CIDR zone files downloaded from the internet.
 By default it will block all known IP-zones. Two config files exist for exclusions.
 - .uca-exclcountry.json with country zones to exclude (basically what you like to allow)
 - .uca-exclzone.json with CIDR zones to exclude (basically a subset of CIDR you like to allow)
@@ -59,61 +41,48 @@ CIDR address block lists provided by http://ipverse.net
 
 The .uca-exclzone.json can be appended automatically with for example:
 - Github webhooks IP zones fetched from https://api.github.com/meta`,
-		},
-		signature: s,
-	}
-
-	c.setup()
-
-	return c
+	// Uncomment the following line if your bare application
+	// has an action associated with it:
+	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
-func (c *Cmd) Execute() {
-	c.Root.Execute()
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	cobra.CheckErr(rootCmd.Execute())
 }
 
-func (c *Cmd) setup() {
-	c.cmds = make(map[string]*cobra.Command)
+func init() {
+	cobra.OnInitialize(initConfig)
 
-	c.initConfig()
+	// Here you will define your flags and configuration settings.
+	// Cobra supports persistent flags, which, if defined here,
+	// will be global for your application.
 
-	// Global flags
-	c.Root.PersistentFlags().BoolP("verbose", "v", false, "verbose")
-	// Local flags
-	// c.Root.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.uca-config.ini)")
+	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "verbose")
 
-	c.addVersionCmd()
-	c.addApplyCmd()
-	c.addRevertCmd()
-
-	// Add root commands
-	// ufw-cidr-autoblock <root-command>
-	for _, ccmd := range c.cmds {
-		c.Root.AddCommand(ccmd)
-	}
-
-	// Set to true for production application.
-	// false enables the bash completion module to generate bash_completion script.
-	// Output needs to be copied to /etc/bash_completion.d/lnx-database-tools
-	c.Root.CompletionOptions.DisableDefaultCmd = true
-	// When set to false additional info is printed for each command during bash_completion
-	c.Root.CompletionOptions.DisableDescriptions = true
+	// Cobra also supports local flags, which will only run
+	// when this action is called directly.
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-// initConfig reads in config files and ENV variables if set.
-func (c *Cmd) initConfig() {
-	if c.exclcountries != "" {
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	if cfgFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(c.exclcountries)
+		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".uca-exclcountry" (without extension).
+		// Search config in home directory with name ".uca-config" (without extension)
+		// secondly in local directory (next to executable)
 		viper.AddConfigPath(home)
-		viper.SetConfigType("json")
-		viper.SetConfigName(".uca-exclcountries")
+		viper.AddConfigPath(".")
+		viper.SetConfigType("ini")
+		viper.SetConfigName(".uca-config")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -123,3 +92,62 @@ func (c *Cmd) initConfig() {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
 }
+
+/*
+// Prepares the SQLite database for storing exceptions
+func prepSQLite() (created bool, err error) {
+	var file *os.File
+
+	rootdir := RootDir()
+
+	fmt.Printf("b %v\n", viper.GetString("defaults.workdir"))
+	fmt.Println(viper.GetString("defaults.workdir"))
+
+	dbLocation := filepath.Join(rootdir,
+		viper.GetString("database.dblocation"),
+		viper.GetString("database.dbname"),
+	)
+
+	fmt.Println(dbLocation)
+
+	if c.reset {
+		os.Remove(dbLocation)
+	}
+
+	if u.DestinationExists(dbLocation) {
+		if u.IsTerminal() || c.Verbose {
+			log.Println("sqlite-database.db already exists, skip creation")
+		}
+		return false, nil
+	}
+
+	if u.IsTerminal() || c.Verbose {
+		log.Println("db not found, creating sqlite-database.db...")
+	}
+	// SQLite is a file based database.
+	// Create SQLite file
+	if file, err = os.Create(viper.GetString("database.dbname")); err != nil {
+		return false, err
+	}
+
+	file.Close()
+
+	if u.IsTerminal() || c.Verbose {
+		log.Println("sqlite-database.db created")
+	}
+
+	return true, nil
+}
+
+// RootDir returns the application root directory
+func RootDir() (dir string) {
+	fmt.Printf("a %v\n", viper.GetString("defaults.workdir"))
+	fmt.Println(viper.GetString("defaults.workdir"))
+	if dir = viper.GetString("defaults.workdir"); dir == "" {
+		return "."
+	}
+
+	return viper.GetString("defaults.workdir")
+}
+
+*/

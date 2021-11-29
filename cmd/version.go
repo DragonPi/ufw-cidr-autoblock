@@ -21,22 +21,43 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c *Cmd) addVersionCmd() {
-	c.cmds["version"] = &cobra.Command{
-		Use:     "version",
-		Short:   "Display application version",
-		Long:    "This command returns the version.",
-		Example: "lnx-database-tool version",
-		Args:    cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			c.printVersion()
-		},
-	}
+var (
+	Version    string
+	Buildstamp string
+	Githash    string
+)
+
+type Signature struct {
+	Version    string
+	Buildstamp string
+	Githash    string
+}
+
+// versionCmd represents the version command
+var versionCmd = &cobra.Command{
+	Use:     "version",
+	Short:   "Display application version",
+	Long:    "This command returns the version.",
+	Example: "ufw-cidr-autoblock version",
+	Args:    cobra.ExactArgs(0),
+	Run: func(cmd *cobra.Command, args []string) {
+		printVersion()
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
 }
 
 // printVersion returns the version of the application
-func (c *Cmd) printVersion() {
-	fmt.Printf("Last build: %s\n", c.signature["Buildstamp"])
-	fmt.Printf("App Version: %s\n", c.signature["Version"])
-	fmt.Printf("Githash: %s\n", c.signature["Githash"])
+func printVersion() {
+	s := &Signature{
+		Version:    Version,
+		Buildstamp: Buildstamp,
+		Githash:    Githash,
+	}
+
+	fmt.Printf("Last build: %s\n", s.Buildstamp)
+	fmt.Printf("App Version: %s\n", s.Version)
+	fmt.Printf("Githash: %s\n", s.Githash)
 }

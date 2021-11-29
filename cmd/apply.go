@@ -21,28 +21,50 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func (c *Cmd) addApplyCmd() {
-	c.cmds["apply"] = &cobra.Command{
-		Use:   "apply",
-		Short: "Apply rules based on CIDR zone files",
-		Long: `This function will apply a set of firewall rules based on zone files with CIDR address blocks.
+// applyCmd represents the apply command
+var applyCmd = &cobra.Command{
+	Use:   "apply",
+	Short: "Apply rules based on CIDR zone files",
+	Long: `This function will apply a set of firewall rules based on zone files with CIDR address blocks.
 When accompanied by the dry-run flag it will generate a test.rules file which can be validated afterwards, but will not apply anything.
 By default it will use zones files already present.  Add the update-zones flag to have these updated/downlaod from the internet.`,
-		Example: "ufw-cidr-autoblock apply",
-		Args:    cobra.ExactArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			c.printApply()
-		},
-	}
-	c.cmds["apply"].PersistentFlags().StringVar(&c.exclcountries, "countries-allow", "", "config file (default is $HOME/.uca-exclcountries.json)")
-	c.cmds["apply"].PersistentFlags().StringVar(&c.exclzones, "zones-allow", "", "config file (default is $HOME/.uca-exclzones.json)")
-	c.cmds["apply"].PersistentFlags().StringVar(&c.inclzones, "zones-block", "", "config file (default is $HOME/.uca-inclzones.json)")
-	c.cmds["apply"].PersistentFlags().BoolP("dry-run", "d", false, "create test.rules but do not apply.")
-	c.cmds["apply"].PersistentFlags().BoolP("update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
-	c.cmds["apply"].PersistentFlags().StringVar(&c.exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
+	Example: "ufw-cidr-autoblock apply",
+	Args:    cobra.ExactArgs(0),
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("apply called")
+		printApply()
+	},
 }
 
-// printRevert prints output from the revert function
-func (c *Cmd) printApply() {
-	fmt.Println("apply called")
+func init() {
+	rootCmd.AddCommand(applyCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
+	applyCmd.PersistentFlags().BoolP("dry-run", "d", false, "create test.rules but do not apply.")
+	applyCmd.PersistentFlags().BoolP("update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
+	//applyCmd.PersistentFlags().StringVar(&c.exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// applyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func printApply() {
+
+}
+
+// appendZones adds CIDR zones to the "automatic_entries" sections of the specified json
+func appendZones(jsonFile string, section string, subsection string, data []string) (err error) {
+
+	return
+}
+
+// removeZones removes CIDR zones from the "automatic_entries" sections of the specified json
+func removeZones(jsonFile string, section string, subsection string) (err error) {
+
+	return
 }
