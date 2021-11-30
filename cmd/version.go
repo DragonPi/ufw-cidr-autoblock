@@ -17,8 +17,11 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
+
+	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
 // These variables are populated during build (-ldflags -> see main.go)
@@ -43,6 +46,9 @@ var versionCmd = &cobra.Command{
 	Example: "ufw-cidr-autoblock version",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
+		if err := u.PrepSQLite(verbose); err != nil {
+			log.Fatal(err)
+		}
 		printVersion()
 	},
 }

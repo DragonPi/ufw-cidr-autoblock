@@ -19,12 +19,7 @@ import (
 	"fmt"
 	"log"
 
-	//"path/filepath"
-	//"database/sql"
-	//"time"
-
 	"github.com/spf13/cobra"
-	//_ "github.com/mattn/go-sqlite3"
 
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )

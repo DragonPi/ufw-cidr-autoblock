@@ -16,11 +16,13 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
 var (
@@ -43,7 +45,7 @@ The .uca-exclzone.json can be appended automatically with for example:
 - Github webhooks IP zones fetched from https://api.github.com/meta`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	//Run: func(cmd *cobra.Command, args []string) {},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -85,69 +87,12 @@ func initConfig() {
 		viper.SetConfigName(".uca-config")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	// viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
-	}
-}
-
-/*
-// Prepares the SQLite database for storing exceptions
-func prepSQLite() (created bool, err error) {
-	var file *os.File
-
-	rootdir := RootDir()
-
-	fmt.Printf("b %v\n", viper.GetString("defaults.workdir"))
-	fmt.Println(viper.GetString("defaults.workdir"))
-
-	dbLocation := filepath.Join(rootdir,
-		viper.GetString("database.dblocation"),
-		viper.GetString("database.dbname"),
-	)
-
-	fmt.Println(dbLocation)
-
-	if c.reset {
-		os.Remove(dbLocation)
-	}
-
-	if u.DestinationExists(dbLocation) {
-		if u.IsTerminal() || c.Verbose {
-			log.Println("sqlite-database.db already exists, skip creation")
+		if u.IsTerminal() && verbose {
+			log.Printf("Using config file: %v\n", viper.ConfigFileUsed())
 		}
-		return false, nil
 	}
-
-	if u.IsTerminal() || c.Verbose {
-		log.Println("db not found, creating sqlite-database.db...")
-	}
-	// SQLite is a file based database.
-	// Create SQLite file
-	if file, err = os.Create(viper.GetString("database.dbname")); err != nil {
-		return false, err
-	}
-
-	file.Close()
-
-	if u.IsTerminal() || c.Verbose {
-		log.Println("sqlite-database.db created")
-	}
-
-	return true, nil
 }
-
-// RootDir returns the application root directory
-func RootDir() (dir string) {
-	fmt.Printf("a %v\n", viper.GetString("defaults.workdir"))
-	fmt.Println(viper.GetString("defaults.workdir"))
-	if dir = viper.GetString("defaults.workdir"); dir == "" {
-		return "."
-	}
-
-	return viper.GetString("defaults.workdir")
-}
-
-*/

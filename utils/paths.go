@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/viper"
 )
 
 // DestinationExists checks if a path or file exists
@@ -36,4 +38,13 @@ func FileExists(file string) (fi fs.FileInfo, err error) {
 	}
 
 	return
+}
+
+// RootDir returns the application root directory
+func RootDir() (dir string) {
+	if dir = viper.GetString("defaults.workdir"); dir == "" {
+		return "."
+	}
+
+	return viper.GetString("defaults.workdir")
 }
