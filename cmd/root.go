@@ -28,6 +28,7 @@ import (
 var (
 	cfgFile string
 	verbose bool
+	dryrun  bool
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -62,6 +63,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.uca-config.ini)")
+	rootCmd.PersistentFlags().BoolVar(&dryrun, "dry-run", false, "create test.rules but do not apply.")
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "verbose")
 
 	// Cobra also supports local flags, which will only run

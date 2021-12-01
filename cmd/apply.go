@@ -16,10 +16,14 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/spf13/cobra"
+
+	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
+
+var exclgithub string
 
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
@@ -31,7 +35,9 @@ By default it will use zones files already present.  Add the update-zones flag t
 	Example: "ufw-cidr-autoblock apply",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("apply called")
+		if err := u.PrepSQLite(verbose); err != nil {
+			log.Fatal(err)
+		}
 		printApply()
 	},
 }
@@ -44,9 +50,9 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
-	applyCmd.PersistentFlags().BoolP("dry-run", "d", false, "create test.rules but do not apply.")
+
+	applyCmd.PersistentFlags().StringVar(&exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
 	applyCmd.PersistentFlags().BoolP("update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
-	//applyCmd.PersistentFlags().StringVar(&c.exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
@@ -54,7 +60,14 @@ func init() {
 }
 
 func printApply() {
-
+	// Download/refresh zones from internet if requested
+	// readout json file with exclusions
+	// readout json fil with inclusions
+	// cache json info into sqlite
+	// backup previous settings
+	//
+	// apply new settings with data from sqlite and downloaded zone files + info from ini file
+	// reload ufw
 }
 
 // appendZones adds CIDR zones to the "automatic_entries" sections of the specified json
