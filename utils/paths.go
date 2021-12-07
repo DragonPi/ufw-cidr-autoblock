@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -26,7 +25,7 @@ func MakeDestination(path string) {
 	dir := filepath.Dir(path)
 	if !DestinationExists(dir) {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
-			log.Fatal(err)
+			Error.Fatal(err)
 		}
 	}
 }

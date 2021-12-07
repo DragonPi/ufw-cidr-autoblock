@@ -32,6 +32,9 @@ var testCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
+		if err := u.PrepSQLite(verbose); err != nil {
+			log.Fatal(err)
+		}
 		printTest()
 	},
 }
@@ -52,33 +55,9 @@ func init() {
 
 // printTest returns output from testing functionalities
 func printTest() {
-	metaData := u.GitHub{}
+	Continents := u.Continents{}
 
-	if err := u.DownloadGitHubIP(&metaData); err != nil {
+	if err := u.DownloadZoneFiles(&Continents); err != nil {
 		log.Fatal(err)
 	}
-
-	/*
-		jsonFile := filepath.Join("home", "koen", "Code", "GitHub", "ufw-cidr-autoblock", "exceptions", ".uca-exclzones.json")
-		section := "GitHub"
-		subsection := "hooks"
-
-		if err := appendZones(jsonFile, section, subsection, metaData.Hooks); err != nil {
-			log.Fatal(err)
-		}
-	*/
-
-	/*fmt.Println(metaData.VPA)
-	fmt.Printf("RSA %v\n", metaData.SSH_fp.RSA)
-	fmt.Printf("ECDSA %v\n", metaData.SSH_fp.ECDSA)
-	fmt.Printf("ED25519 %v\n", metaData.SSH_fp.ED25519)*/
-	fmt.Println(metaData.Hooks)
-	/*fmt.Println(metaData.Web)
-	fmt.Println(metaData.API)
-	fmt.Println(metaData.Git)
-	fmt.Println(metaData.Packages)
-	fmt.Println(metaData.Pages)
-	fmt.Println(metaData.Importer)
-	fmt.Println(metaData.Actions)
-	fmt.Println(metaData.Dependabot)*/
 }
