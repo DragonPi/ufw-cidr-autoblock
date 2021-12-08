@@ -234,10 +234,10 @@ func populateSQLite(verbose bool) (err error) {
 
 // doQuery does a query on the sqlite database
 // but returns no data
-func doQuery(query string, db *sql.DB) (err error) {
+func doQuery(query string, dbc *sql.DB) (err error) {
 	var statement *sql.Stmt
 	// Prepare SQL Statement
-	if statement, err = db.Prepare(query); err != nil {
+	if statement, err = dbc.Prepare(query); err != nil {
 		Error.Fatalln(err.Error())
 	}
 	// Execute SQL Statement
@@ -247,14 +247,14 @@ func doQuery(query string, db *sql.DB) (err error) {
 }
 
 // insertZoneRecord inserts a zone record in the database
-func insertZoneRecord(query string, data []interface{}, db *sql.DB) (err error) {
+func insertZoneRecord(query string, data []interface{}, dbc *sql.DB) (err error) {
 	var statement *sql.Stmt
 
 	// Prepare SQL statement
 	// This is to avoid SQL injections
 	querySuffix := " VALUES (?, ?, ?)"
 	query += querySuffix
-	if statement, err = db.Prepare(query); err != nil {
+	if statement, err = dbc.Prepare(query); err != nil {
 		return err
 	}
 
