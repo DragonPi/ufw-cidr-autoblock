@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -50,23 +49,6 @@ type GH_ssh_fp struct {
 	RSA     string `json:"SHA256_RSA"`
 	ECDSA   string `json:"SHA256_ECDSA"`
 	ED25519 string `json:"SHA256_ED25519"`
-}
-
-// Countries contains the ISO-3166-1 style country codes
-// extracted from .uca-exclcountries.json
-type Continents struct {
-	Afrika       Zones `json:"AFRICA"`
-	Asia         Zones `json:"ASIA"`
-	Europe       Zones `json:"EUROPE"`
-	NorthAmerica Zones `json:"NORTH_AMERICA"`
-	SouthAmerica Zones `json:"SOUTH_AMERICA"`
-	Oceania      Zones `json:"OCEANIA"`
-	Antartica    Zones `json:"ANTARTICA"`
-}
-
-type Zones struct {
-	Zones     []string `json:"zones"`
-	Unblocked []string `json:"unblocked"`
 }
 
 // DownloadGithubIP fetches the CIDR zones from the GitHub API, meta endpoint
@@ -111,34 +93,9 @@ func DownloadGitHubIP(metaData *GitHub) (err error) {
 // DownloadZoneFiles fetches the CIDR zones files from ipverse.net
 //
 // It uses concurrent connections to speed up the download
-func DownloadZoneFiles(continents *Continents) (err error) {
-	var (
-		concurrency  int
-		countryZones []string
-	)
-
+func DownloadZoneFiles(countryZones []string) (err error) {
 	// Configure the number of concurrent connections to download the zone files
-	if viper.GetString("defaults.concurrency") == "" || viper.GetString("defaults.concurrency") == "0" {
-		concurrency = 1
-	} else {
-		if concurrency, err = strconv.Atoi(viper.GetString("defaults.concurrency")); err != nil {
-			return err
-		}
-	}
-
-	// Write needed info in struct
-	if err = unmarshallCountriesJSON(&continents); err != nil {
-		return err
-	}
-	// Make a single array from all the zones with a known CIDR file
-	countryZones = append(append(append(append(append(append(append(countryZones,
-		continents.Afrika.Zones...),
-		continents.Asia.Zones...),
-		continents.Europe.Zones...),
-		continents.NorthAmerica.Zones...),
-		continents.SouthAmerica.Zones...),
-		continents.Oceania.Zones...),
-		continents.Antartica.Zones...)
+	concurrency := defineConcurrency()
 
 	// Make downloads concurrently
 	sem := make(chan bool, concurrency)
@@ -150,7 +107,8 @@ func DownloadZoneFiles(continents *Continents) (err error) {
 			defer func() { <-sem }()
 
 			if err = doZoneDownload(strings.ToLower(country)); err != nil {
-				// If a file fails to download, I want to continue with the others
+				// If a file fails to download, I want to continue
+				// with the others but send a warning nevertheless
 				Warning.Println(err)
 			}
 		}(country)
@@ -163,34 +121,13 @@ func DownloadZoneFiles(continents *Continents) (err error) {
 	return
 }
 
-// unmarshallCountriesJSON reads the info from provided json file
-// and fills struct with the needed info.
-func unmarshallCountriesJSON(continents **Continents) (err error) {
-	var (
-		exclFile *os.File
-		body     []byte
-	)
-
-	if exclFile, err = os.Open("exceptions/.uca-exclcountries.json"); err != nil {
-		return fmt.Errorf("opening .uca-exclcountries.json: %w", err)
-	}
-	defer exclFile.Close()
-
-	if body, err = ioutil.ReadAll(exclFile); err != nil {
-		return fmt.Errorf("reading .uca-exclcountries.json: %w", err)
-	}
-
-	json.Unmarshal(body, &continents)
-
-	return
-}
-
 // doZoneDownload does the actual download of the zone file and saves
 // it in the location set in the .uca-config.ini file
 func doZoneDownload(country string) (err error) {
 	var (
 		req *http.Request
 		res *http.Response
+		out *os.File
 	)
 
 	baseURL := "http://ipverse.net/ipblocks/data/countries/"
@@ -218,8 +155,7 @@ func doZoneDownload(country string) (err error) {
 	zoneFile := filepath.Join(viper.GetString("zones.zonesLocation"), zone)
 	MakeDestination(zoneFile)
 
-	out, err := os.Create(zoneFile)
-	if err != nil {
+	if out, err = os.Create(zoneFile); err != nil {
 		return err
 	}
 	defer out.Close()

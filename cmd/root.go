@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -30,18 +29,6 @@ var (
 	verbose bool
 	dryrun  bool
 )
-
-// Info writes logs in the color blue with "INFO: " as prefix
-var Info = log.New(os.Stdout, "\u001b[34mINFO: \u001B[0m", log.LstdFlags|log.Lshortfile)
-
-// Warning writes logs in the color yellow with "WARNING: " as prefix
-var Warning = log.New(os.Stdout, "\u001b[33mWARNING: \u001B[0m", log.LstdFlags|log.Lshortfile)
-
-// Error writes logs in the color red with "ERROR: " as prefix
-var Error = log.New(os.Stdout, "\u001b[31mERROR: \u001b[0m", log.LstdFlags|log.Lshortfile)
-
-// Debug writes logs in the color cyan with "DEBUG: " as prefix
-var Debug = log.New(os.Stdout, "\u001b[36mDEBUG: \u001B[0m", log.LstdFlags|log.Lshortfile)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -76,7 +63,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.uca-config.ini)")
 	rootCmd.PersistentFlags().BoolVar(&dryrun, "dry-run", false, "create test.rules but do not apply.")
-	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "verbose")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -106,7 +93,7 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		if u.IsTerminal() && verbose {
-			log.Printf("Using config file: %v\n", viper.ConfigFileUsed())
+			u.Info.Printf("Using config file: %v\n", viper.ConfigFileUsed())
 		}
 	}
 }

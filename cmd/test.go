@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 
@@ -32,8 +31,9 @@ var testCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
+
 		if err := u.PrepSQLite(verbose); err != nil {
-			log.Fatal(err)
+			u.Error.Fatal(err)
 		}
 		printTest()
 	},
@@ -55,9 +55,6 @@ func init() {
 
 // printTest returns output from testing functionalities
 func printTest() {
-	Continents := u.Continents{}
-
-	if err := u.DownloadZoneFiles(&Continents); err != nil {
-		log.Fatal(err)
-	}
+	u.ListAllowedZones()
+	u.ListBlockedZones()
 }

@@ -23,7 +23,10 @@ import (
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
-var exclgithub string
+var (
+	exclgithub string
+	update     bool
+)
 
 // applyCmd represents the apply command
 var applyCmd = &cobra.Command{
@@ -52,17 +55,49 @@ func init() {
 	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	applyCmd.PersistentFlags().StringVar(&exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
-	applyCmd.PersistentFlags().BoolP("update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
+	applyCmd.PersistentFlags().BoolVarP(&update, "update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// applyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//applyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func printApply() {
+	var (
+		countryZones []string
+		//unblockedZones []string
+		err error
+	)
+
+	continents := u.Continents{}
+	metaData := u.GitHub{}
+
+	// Write needed info in struct
+	if err = u.UnmarshallCountries(&continents); err != nil {
+		u.Error.Fatalln(err)
+	}
+
+	countryZones = u.MakeCountryZoneArray(&continents)
+	//unblockedZones = u.MakeCountryUnblockArray(&continents)
+
 	// Download/refresh zones from internet if requested
+	if update {
+		if err = u.DownloadGitHubIP(&metaData); err != nil {
+			// info is cached in sqlite, so we can still
+			// apply the rules but with "old" data, therefore only warn
+			u.Warning.Println(err)
+		} else {
+			// Download successful so cache it in sqlite db
+			if err = u.CacheGitHub(&metaData); err != nil {
+				u.Error.Fatalln(err.Error())
+			}
+		}
+		if err := u.DownloadZoneFiles(countryZones); err != nil {
+			u.Warning.Println(err)
+		}
+	}
 	// readout json file with exclusions
-	// readout json fil with inclusions
+	// readout json file with inclusions
 	// cache json info into sqlite
 	// backup previous settings
 	//
