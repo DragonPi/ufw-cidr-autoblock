@@ -88,7 +88,7 @@ func ListAllowedZones() (err error) {
 	return
 }
 
-// ListAllowedZones prompts the allowed zones as cached in sqlite
+// ListBlockedZones prompts the blocked zones as cached in sqlite
 func ListBlockedZones() (err error) {
 	var row *sql.Rows
 
