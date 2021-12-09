@@ -18,7 +18,7 @@ func CacheGitHub(metaData *GitHub) (err error) {
 	if dbc, err = openSQLite(); err != nil {
 		return err
 	}
-	// Defer closing the database connection
+	// Close database after function completed
 	defer dbc.Close()
 
 	allowedGitHub := strings.Split(viper.GetString("exclusions.GitHub"), ",")
@@ -82,7 +82,7 @@ func ListAllowedZones() (err error) {
 	if dbc, err = openSQLite(); err != nil {
 		return err
 	}
-	// Defer closing the database connection
+	// Close database after function completed
 	defer dbc.Close()
 
 	if row, err = dbc.Query("SELECT * FROM allowzones ORDER BY reference"); err != nil {
@@ -118,7 +118,7 @@ func ListBlockedZones() (err error) {
 	if dbc, err = openSQLite(); err != nil {
 		return err
 	}
-	// Defer closing the database connection
+	// Close database after function completed
 	defer dbc.Close()
 
 	if row, err = dbc.Query("SELECT * FROM blockzones ORDER BY reference"); err != nil {
@@ -188,7 +188,7 @@ func ensureSQLite(verbose bool) (created bool, err error) {
 	}
 
 	if IsTerminal() || verbose {
-		Info.Printf("db not found, creating %v...\n", dbName)
+		Info.Printf("db backend not found at configured location, creating %v...\n", dbName)
 	}
 
 	MakeDestination(dbLocation)
@@ -213,13 +213,19 @@ func populateSQLite(verbose bool) (err error) {
 	if dbc, err = openSQLite(); err != nil {
 		return err
 	}
-	// Defer closing the database connection
+	// Close database after function completed
 	defer dbc.Close()
 
 	if err = createBlockzonesTable(verbose, dbc); err != nil {
 		return err
 	}
 	if err = createAllowzonesTable(verbose, dbc); err != nil {
+		return err
+	}
+	if err = createBlockedcountriesTable(verbose, dbc); err != nil {
+		return err
+	}
+	if err = createAllowedcountriesTable(verbose, dbc); err != nil {
 		return err
 	}
 
@@ -271,26 +277,37 @@ func openSQLite() (dbc *sql.DB, err error) {
 	return dbc, nil
 }
 
+// dbDir is a shorthand to get the sqlite database folder
+func dbDir() (dbDir string) {	
+	if viper.GetString("database.dbLocationHidden") == "yes" {
+		dbDir = "." + viper.GetString("database.dblocation")
+	} else {
+		dbDir = viper.GetString("database.dblocation")
+	}
+
+	return
+}
+
 // dbName is a shorthand to get the sqlite database name
 func dbName() (dbName string) {
 	dbName = viper.GetString("defaults.filePrefix") + "-" + viper.GetString("database.dbname")
-	if viper.GetString("defaults.fileSuffix") != "" {
-		dbName += "-" + viper.GetString("defaults.fileSuffix")
+
+	if suffix := viper.GetString("defaults.fileSuffix"); suffix != "" {
+		dbName += "-" + suffix
 	}
+	
 	dbName += ".db"
 
 	return
 }
 
-// dbLocation is a shorthand to get the sqlite database path
+// dbLocation is a shorthand to get the full sqlite database path, filename included
 func dbLocation() (dbLocation string) {
 	rootdir := RootDir()
+	dbDir := dbDir()
 	dbName := dbName()
-
-	dbLocation = filepath.Join(rootdir,
-		viper.GetString("database.dblocation"),
-		dbName,
-	)
+	
+	dbLocation = filepath.Join(rootdir, dbDir, dbName)
 
 	return
 }
@@ -340,6 +357,56 @@ func createAllowzonesTable(verbose bool, dbc *sql.DB) (err error) {
 
 	if verbose {
 		Info.Println("Created table allowzones...")
+	}
+
+	return nil
+}
+
+// createBlockedcountriesTable executes the SQL Statement for creating
+// table containing explicitely allowed countries
+func createBlockedcountriesTable(verbose bool, dbc *sql.DB) (err error) {
+	stmt := `CREATE TABLE blockedcountries (
+		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
+		"country" TEXT,
+		"country_long" TEXT,
+		"manual" INTEGER
+  	);`
+
+	if verbose {
+		Info.Println("Creating table blockedcountries...")
+	}
+
+	if err = doQuery(stmt, dbc); err != nil {
+		return err
+	}
+
+	if verbose {
+		Info.Println("Created table blockedcountries...")
+	}
+
+	return nil
+}
+
+// createAllowedcountriesTable executes the SQL Statement for creating
+// table containing explicitely allowed countries
+func createAllowedcountriesTable(verbose bool, dbc *sql.DB) (err error) {
+	stmt := `CREATE TABLE allowedcountries (
+		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
+		"country" TEXT,
+		"country_long" TEXT,
+		"manual" INTEGER
+  	);`
+
+	if verbose {
+		Info.Println("Creating table allowedcountries...")
+	}
+
+	if err = doQuery(stmt, dbc); err != nil {
+		return err
+	}
+
+	if verbose {
+		Info.Println("Created table allowedcountries...")
 	}
 
 	return nil

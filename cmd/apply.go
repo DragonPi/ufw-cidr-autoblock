@@ -16,13 +16,15 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
 var (
-	exclgithub string
+	exclgithub bool
 	update     bool
 )
 
@@ -52,8 +54,8 @@ func init() {
 	// and all subcommands, e.g.:
 	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	applyCmd.PersistentFlags().StringVar(&exclgithub, "exclude-github", "", "exclude zones provided by GitHub API")
-	applyCmd.PersistentFlags().BoolVarP(&update, "update-zones", "u", false, "update the zone files (will download/refresh zone files from internet)")
+	applyCmd.PersistentFlags().BoolVarP(&exclgithub, "exclude-github", "", false, "exclude zones provided by GitHub API")
+	applyCmd.PersistentFlags().BoolVarP(&update, "update-zones", "", false, "update the zone files (will download/refresh zone files from internet)")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
@@ -63,20 +65,30 @@ func init() {
 func printApply() {
 	var (
 		countryZones []string
-		//unblockedZones []string
+		unblockedZones []string
 		err error
 	)
 
 	continents := u.Continents{}
 	metaData := u.GitHub{}
+	allowedZones := u.Allowedzones{}
+	blockedZones := u.Blockedzones{}
 
 	// Write needed info in struct
 	if err = u.UnmarshallCountries(&continents); err != nil {
 		u.Error.Fatalln(err)
 	}
+	// Write needed info in struct
+	if err = u.UnmarshallAllowedZones(&allowedZones); err != nil {
+		u.Error.Fatalln(err)
+	}
+	// Write needed info in struct
+	if err = u.UnmarshallBlockedZones(&blockedZones); err != nil {
+		u.Error.Fatalln(err)
+	}
 
 	countryZones = u.MakeCountryZoneArray(&continents)
-	//unblockedZones = u.MakeCountryUnblockArray(&continents)
+	unblockedZones = u.MakeCountryUnblockArray(&continents)
 
 	// Download/refresh zones from internet if requested
 	if update {
@@ -99,6 +111,8 @@ func printApply() {
 			}
 		}
 	}
+
+	fmt.Printf("%+v\n", unblockedZones)
 	// readout json file with exclusions
 	// readout json file with inclusions
 	// cache json info into sqlite

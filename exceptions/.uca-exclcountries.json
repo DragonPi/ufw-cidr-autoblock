@@ -10,10 +10,9 @@
             "RW", "ST", "SN", "SC", "SL", "SO", "ZA", "SS", "SD", "SZ",
             "TZ", "TG", "TN", "UG", "ZM", "ZW"
         ],
-        "no_zone": {
-            "Saint_Helena": "SH",
-            "Western_Sahara": "EH"
-        },
+        "no_zone": [
+            "SH", "EH"
+        ],
         "countries": {
             "Algeria": "DZ",
             "Angola": "AO",
@@ -56,6 +55,7 @@
             "Nigeria": "NG",
             "Reunion": "RE",
             "Rwanda": "RW",
+            "Saint_Helena": "SH",
             "Soa_Tome_And_Principe": "ST",
             "Senegal": "SN",
             "Seychelles": "SC",
@@ -69,6 +69,7 @@
             "Togo": "TG",
             "Tunisia": "TN",
             "Uganda": "UG",
+            "Western_Sahara": "EH",
             "Zambia": "ZM",
             "Zimbabwe": "ZW"
         }
@@ -83,10 +84,9 @@
             "LK", "SY", "TW", "TJ", "TH", "TL", "TR", "TM", "AE", "UZ",
             "VN", "YE"
         ],
-        "no_zone": {
-            "Christmas_Island": "CX",
-            "Cocos_Islands": "CC"
-        },
+        "no_zone": [
+            "CX", "CC"
+        ],
         "countries": {
             "Afghanistan": "AF",
             "Armenia": "AM",
@@ -98,6 +98,8 @@
             "Brunei_Darussalam": "BN",
             "Cambodia": "KH",
             "China": "CN",
+            "Christmas_Island": "CX",
+            "Cocos_Islands": "CC",
             "Cyprus": "CY",
             "Georgia": "GE",
             "Hong_Kong": "HK",
@@ -143,7 +145,9 @@
         }
     },
     "EUROPE": {        
-        "unblocked": ["BE"],
+        "unblocked": [
+            "BE"
+        ],
         "zones" : [            
             "AX", "AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CZ",
             "DK", "EE", "FO", "FI", "FR", "DE", "GI", "GR", "GG", "HU",
@@ -151,11 +155,9 @@
             "MT", "MD", "MC", "ME", "NL", "NO", "PL", "PT", "RO", "RU",
             "SM", "RS", "SK", "SI", "ES", "SJ", "SE", "CH", "UA", "GB"
         ],
-        "no_zone": {
-            "European_Union": "EU",
-            "Vatican": "VA",
-            "Kosovo": "XK"
-        },
+        "no_zone": [
+            "EU", "VA", "XK"
+        ],
         "countries": {
             "Aland_Islands": "AX",
             "Albania": "AL",
@@ -168,7 +170,8 @@
             "Croatia": "HR",
             "Czech_Republic": "CZ",
             "Denmark": "DK",
-            "Estonia": "EE",  
+            "Estonia": "EE",
+            "European_Union": "EU",
             "Faroe_Islands": "FO",
             "Finland": "FI",
             "France": "FR",
@@ -182,6 +185,7 @@
             "Isle_Of_Man": "IM",
             "Italy": "IT",
             "Jersey": "JE",
+            "Kosovo": "XK",
             "Latvia": "LV",
             "Liechtenstein": "LI",
             "Lithuania": "LT",
@@ -206,7 +210,8 @@
             "Sweden": "SE",
             "Switzerland": "CH",
             "Ukraine": "UA",
-            "United_Kingdom": "GB"
+            "United_Kingdom": "GB",
+            "Vatican": "VA"
         }
     },
     "NORTH_AMERICA": {        
@@ -218,10 +223,9 @@
             "KN", "LC", "MF", "PM", "VC", "SX", "TT", "TC", "US", "VG",
             "VI"
         ],
-        "no_zone": {
-            "Netherlands_Antilles": "",
-            "United_States_Minor_Outlying_Islands": "UM"            
-        },
+        "no_zone": [
+            "UM"
+        ],
         "countries": {
             "Anguilla": "AI",
             "Antigua_And_Barbuda": "AG",
@@ -231,6 +235,7 @@
             "Belize": "BZ",
             "Bermuda": "BM",
             "Bonaire": "BQ",
+            "British_Virgin_Islands": "VG",
             "Canada": "CA",
             "Cayman_Islands": "KY",
             "Costa_Rica": "CR",
@@ -249,6 +254,7 @@
             "Martinique": "MQ",
             "Mexico": "MX",
             "Montserrat": "MS",
+            "Netherlands_Antilles": "",
             "Nicaragua": "NI",
             "Panama": "PA",
             "Puerto_Rico": "PR",
@@ -262,8 +268,8 @@
             "Trinidad_And_Tobago": "TT",
             "Turks_And_Caicos_Islands": "TC",
             "United_States": "US",
-            "British_Virgin_Islands": "VG",
-            "US_Virgin_Islands": "VI"
+            "Unites_States_Minor_Outlying_Islands": "UM",   
+            "Unites_States_Virgin_Islands": "VI"
         }
     },
     "SOUTH_AMERICA": {        
@@ -272,8 +278,7 @@
             "AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PY", 
             "PE", "SR", "UY", "VE"
         ],
-        "no_zone": {            
-        },
+        "no_zone": [],            
         "countries": {
             "Argentina": "AR",
             "Bolivia": "BO",
@@ -298,13 +303,13 @@
             "NC", "NZ", "NU", "NF", "MP", "PW", "PG", "WS", "SB", "TK",
             "TO", "TV", "VU", "WF"
         ], 
-        "no_zone": {
-            "Asia_Pacific": "",
-            "Pitcairn": "PN"
-        },
+        "no_zone": [
+            "PN"
+        ],
         "countries": {
             "American_Samoa": "AS",
             "Australia": "AU",
+            "Asia_Pacific": "",
             "Cook_Islands": "CK",
             "Fiji": "FJ",
             "French_Polynesia": "PF",
@@ -320,6 +325,7 @@
             "Northern_Mariana_Islands": "MP",
             "Palau": "PW",
             "Papua_New_Guinea": "PG",
+            "Pitcairn": "PN",
             "Samoa": "WS",
             "Solomon_Islands": "SB",
             "Tokelau": "TK",
@@ -331,17 +337,16 @@
     },
     "ANTARTICA": {        
         "unblocked": [],
-        "zones" : [
+        "zones" : [],
+        "no_zone": [
             "AQ", "BV", "TF", "HM", "GS"
         ],
-        "no_zone": {
-            "Antartica": "AQ",
-            "Bouvet_Island": "BV",
-            "French_Southern_Territories": "TF",
-            "Heard_And_Mc_Donald_Islands": "HM",
-            "South_Georgia_And_The_South_Sandwich_Islands": "GS"
-        },
         "countries": {
+             "Antartica" : "AQ",
+             "Bouvet_Island" : "BV",
+             "French_Southern_Territories" : "TF",
+             "Heard_And_Mc_Donald_Islands" : "HM",
+             "South_Georgia_And_The_South_Sandwich_Islands" : "GS"
         }    
     }
 }
