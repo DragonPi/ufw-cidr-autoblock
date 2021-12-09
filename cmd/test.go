@@ -55,6 +55,12 @@ func init() {
 
 // printTest returns output from testing functionalities
 func printTest() {
-	u.ListAllowedZones()
-	u.ListBlockedZones()
+	var err error
+
+	if err = u.ListAllowedZones(); err != nil {
+		u.Error.Fatal(err)
+	}
+	if err = u.ListBlockedZones(); err != nil {
+		u.Error.Fatal(err)
+	}
 }

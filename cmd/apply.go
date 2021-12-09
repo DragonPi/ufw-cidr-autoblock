@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
@@ -39,7 +37,7 @@ By default it will use zones files already present.  Add the update-zones flag t
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := u.PrepSQLite(verbose); err != nil {
-			log.Fatal(err)
+			u.Error.Fatal(err)
 		}
 		printApply()
 	},
@@ -94,6 +92,11 @@ func printApply() {
 		}
 		if err := u.DownloadZoneFiles(countryZones); err != nil {
 			u.Warning.Println(err)
+		} else {
+			// Download successful so cache it in sqlite db
+			if err = u.CacheZoneFiles(); err != nil {
+				u.Error.Fatalln(err.Error())
+			}
 		}
 	}
 	// readout json file with exclusions

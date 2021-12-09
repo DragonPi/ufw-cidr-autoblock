@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/cobra"
 
@@ -47,7 +46,7 @@ var versionCmd = &cobra.Command{
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := u.PrepSQLite(verbose); err != nil {
-			log.Fatal(err)
+			u.Error.Fatal(err)
 		}
 		printVersion()
 	},
