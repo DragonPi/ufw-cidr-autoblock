@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	sql "github.com/DragonPi/ufw-cidr-autoblock/sqlite"
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
@@ -38,7 +39,7 @@ By default it will use zones files already present.  Add the update-zones flag t
 	Example: "ufw-cidr-autoblock apply",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := u.PrepSQLite(verbose); err != nil {
+		if err := sql.PrepSQLite(verbose); err != nil {
 			u.Error.Fatal(err)
 		}
 		printApply()
@@ -64,9 +65,9 @@ func init() {
 
 func printApply() {
 	var (
-		countryZones []string
+		countryZones   []string
 		unblockedZones []string
-		err error
+		err            error
 	)
 
 	continents := u.Continents{}
@@ -77,14 +78,26 @@ func printApply() {
 	// Write needed info in struct
 	if err = u.UnmarshallCountries(&continents); err != nil {
 		u.Error.Fatalln(err)
+	} else {
+		if err = sql.CacheCountries(&continents); err != nil {
+			u.Error.Fatalln(err.Error())
+		}
 	}
 	// Write needed info in struct
 	if err = u.UnmarshallAllowedZones(&allowedZones); err != nil {
 		u.Error.Fatalln(err)
+	} else {
+		if err = sql.CacheAllowedZones(&allowedZones); err != nil {
+			u.Error.Fatalln(err.Error())
+		}
 	}
 	// Write needed info in struct
 	if err = u.UnmarshallBlockedZones(&blockedZones); err != nil {
 		u.Error.Fatalln(err)
+	} else {
+		if err = sql.CacheBlockedZones(&blockedZones); err != nil {
+			u.Error.Fatalln(err.Error())
+		}
 	}
 
 	countryZones = u.MakeCountryZoneArray(&continents)
@@ -98,7 +111,7 @@ func printApply() {
 			u.Warning.Println(err)
 		} else {
 			// Download successful so cache it in sqlite db
-			if err = u.CacheGitHub(&metaData); err != nil {
+			if err = sql.CacheAllowedGitHub(&metaData); err != nil {
 				u.Error.Fatalln(err.Error())
 			}
 		}
@@ -106,7 +119,7 @@ func printApply() {
 			u.Warning.Println(err)
 		} else {
 			// Download successful so cache it in sqlite db
-			if err = u.CacheZoneFiles(); err != nil {
+			if err = sql.CacheZoneFiles(); err != nil {
 				u.Error.Fatalln(err.Error())
 			}
 		}

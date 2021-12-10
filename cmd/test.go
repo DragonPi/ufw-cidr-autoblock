@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	sql "github.com/DragonPi/ufw-cidr-autoblock/sqlite"
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
@@ -32,7 +33,7 @@ var testCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
 
-		if err := u.PrepSQLite(verbose); err != nil {
+		if err := sql.PrepSQLite(verbose); err != nil {
 			u.Error.Fatal(err)
 		}
 		printTest()
@@ -57,10 +58,10 @@ func init() {
 func printTest() {
 	var err error
 
-	if err = u.ListAllowedZones(); err != nil {
+	if err = sql.ListAllowedZones(); err != nil {
 		u.Error.Fatal(err)
 	}
-	if err = u.ListBlockedZones(); err != nil {
+	if err = sql.ListBlockedZones(); err != nil {
 		u.Error.Fatal(err)
 	}
 }

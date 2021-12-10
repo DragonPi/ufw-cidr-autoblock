@@ -11,13 +11,13 @@ import (
 func MakeCountryZoneArray(continents *Continents) (countryZones []string) {
 	// Make a single array from all the zones with a known CIDR file
 	countryZones = append(append(append(append(append(append(append(countryZones,
-		continents.AfrikaZones.Zones...),
-		continents.AsiaZones.Zones...),
-		continents.EuropeZones.Zones...),
-		continents.NorthAmericaZones.Zones...),
-		continents.SouthAmericaZones.Zones...),
-		continents.OceaniaZones.Zones...),
-		continents.AntarticaZones.Zones...)
+		continents.Afrika.Zones...),
+		continents.Asia.Zones...),
+		continents.Europe.Zones...),
+		continents.NorthAmerica.Zones...),
+		continents.SouthAmerica.Zones...),
+		continents.Oceania.Zones...),
+		continents.Antartica.Zones...)
 
 	return
 }
@@ -27,13 +27,13 @@ func MakeCountryZoneArray(continents *Continents) (countryZones []string) {
 func MakeCountryUnblockArray(continents *Continents) (unblockedZones []string) {
 	// Make a single array from all the zones with a known CIDR file
 	unblockedZones = append(append(append(append(append(append(append(unblockedZones,
-		continents.AfrikaZones.Unblocked...),
-		continents.AsiaZones.Unblocked...),
-		continents.EuropeZones.Unblocked...),
-		continents.NorthAmericaZones.Unblocked...),
-		continents.SouthAmericaZones.Unblocked...),
-		continents.OceaniaZones.Unblocked...),
-		continents.AntarticaZones.Unblocked...)
+		continents.Afrika.Unblocked...),
+		continents.Asia.Unblocked...),
+		continents.Europe.Unblocked...),
+		continents.NorthAmerica.Unblocked...),
+		continents.SouthAmerica.Unblocked...),
+		continents.Oceania.Unblocked...),
+		continents.Antartica.Unblocked...)
 
 	return
 }

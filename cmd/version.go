@@ -20,6 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	sql "github.com/DragonPi/ufw-cidr-autoblock/sqlite"
 	u "github.com/DragonPi/ufw-cidr-autoblock/utils"
 )
 
@@ -45,7 +46,7 @@ var versionCmd = &cobra.Command{
 	Example: "ufw-cidr-autoblock version",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := u.PrepSQLite(verbose); err != nil {
+		if err := sql.PrepSQLite(verbose); err != nil {
 			u.Error.Fatal(err)
 		}
 		printVersion()

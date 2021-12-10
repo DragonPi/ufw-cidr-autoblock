@@ -13,13 +13,13 @@ import (
 // Continents contains the ISO-3166-1 style country codes
 // extracted from .uca-exclcountries.json divided by continent
 type Continents struct {
-	AfrikaZones           Zones `json:"AFRICA"`
-	AsiaZones             Zones `json:"ASIA"`
-	EuropeZones           Zones `json:"EUROPE"`
-	NorthAmericaZones     Zones `json:"NORTH_AMERICA"`
-	SouthAmericaZones     Zones `json:"SOUTH_AMERICA"`
-	OceaniaZones          Zones `json:"OCEANIA"`
-	AntarticaZones        Zones `json:"ANTARTICA"`
+	Afrika       Zones `json:"AFRICA"`
+	Asia         Zones `json:"ASIA"`
+	Europe       Zones `json:"EUROPE"`
+	NorthAmerica Zones `json:"NORTH_AMERICA"`
+	SouthAmerica Zones `json:"SOUTH_AMERICA"`
+	Oceania      Zones `json:"OCEANIA"`
+	Antartica    Zones `json:"ANTARTICA"`
 }
 
 // Zones contains for each continent (referenced in Contintents)
@@ -32,13 +32,13 @@ type Zones struct {
 // Allowedzones contains zones that should be explicitely allowed
 // see exclzones.json file
 type Allowedzones struct {
-	CIDR     []string `json:"allowed"`
+	CIDR []string `json:"allowed"`
 }
 
 // Blockedzones contains zones that should be explicitely blocked
 // see inclzones.json file
 type Blockedzones struct {
-	CIDR     []string `json:"blocked"`
+	CIDR []string `json:"blocked"`
 }
 
 // unmarshallCountries reads the info from provided json file
@@ -72,12 +72,12 @@ func UnmarshallAllowedZones(allowedZones *Allowedzones) (err error) {
 	)
 
 	if exclFile, err = os.Open(exclLocation()); err != nil {
-		return fmt.Errorf("opening %s: %w", exclName(), err)
+		return fmt.Errorf("opening %s: %w", ExclName(), err)
 	}
 	defer exclFile.Close()
 
 	if body, err = ioutil.ReadAll(exclFile); err != nil {
-		return fmt.Errorf("reading %s: %w", exclName(), err)
+		return fmt.Errorf("reading %s: %w", ExclName(), err)
 	}
 
 	json.Unmarshal(body, &allowedZones)
@@ -94,12 +94,12 @@ func UnmarshallBlockedZones(blockedZones *Blockedzones) (err error) {
 	)
 
 	if exclFile, err = os.Open(inclLocation()); err != nil {
-		return fmt.Errorf("opening %s: %w", inclName(), err)
+		return fmt.Errorf("opening %s: %w", InclName(), err)
 	}
 	defer exclFile.Close()
 
 	if body, err = ioutil.ReadAll(exclFile); err != nil {
-		return fmt.Errorf("reading %s: %w", inclName(), err)
+		return fmt.Errorf("reading %s: %w", InclName(), err)
 	}
 
 	json.Unmarshal(body, &blockedZones)
@@ -108,22 +108,22 @@ func UnmarshallBlockedZones(blockedZones *Blockedzones) (err error) {
 }
 
 // exclDir is a shorthand to get the exclusions folder
-func exclDir() (string) {
+func exclDir() string {
 	return viper.GetString("exclusions.exclusionsLocation")
 }
 
 // exclName is a shorthand to get the exclusions file name
-func exclName() (exclName string) {
+func ExclName() (exclName string) {
 	if viper.GetString("exclusions.exclusionsHidden") == "yes" {
 		exclName = "."
 	}
-	
+
 	exclName += viper.GetString("defaults.filePrefix") + "-" + viper.GetString("exclusions.exclusionsName")
 
 	if suffix := viper.GetString("defaults.fileSuffix"); suffix != "" {
 		exclName += "-" + suffix
 	}
-	
+
 	exclName += ".json"
 
 	return
@@ -133,30 +133,30 @@ func exclName() (exclName string) {
 func exclLocation() (exclLocation string) {
 	rootdir := RootDir()
 	exclDir := exclDir()
-	exclName := exclName()
-	
+	exclName := ExclName()
+
 	exclLocation = filepath.Join(rootdir, exclDir, exclName)
 
 	return
 }
 
 // inclDir is a shorthand to get the inclusions folder
-func inclDir() (string) {
+func inclDir() string {
 	return viper.GetString("inclusions.inclusionsLocation")
 }
 
 // inclName is a shorthand to get the inclusions file name
-func inclName() (inclName string) {
+func InclName() (inclName string) {
 	if viper.GetString("inclusions.inclusionsHidden") == "yes" {
 		inclName = "."
 	}
-	
+
 	inclName += viper.GetString("defaults.filePrefix") + "-" + viper.GetString("inclusions.inclusionsName")
 
 	if suffix := viper.GetString("defaults.fileSuffix"); suffix != "" {
 		inclName += "-" + suffix
 	}
-	
+
 	inclName += ".json"
 
 	return
@@ -166,8 +166,8 @@ func inclName() (inclName string) {
 func inclLocation() (inclLocation string) {
 	rootdir := RootDir()
 	inclDir := inclDir()
-	inclName := inclName()
-	
+	inclName := InclName()
+
 	inclLocation = filepath.Join(rootdir, inclDir, inclName)
 
 	return
