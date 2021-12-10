@@ -21,7 +21,7 @@ func CacheAllowedZones(allowedZones *u.Allowedzones) (err error) {
 	defer dbc.Close()
 
 	for _, zone := range CIDR {
-		if err = allowZone(zone, u.exclName(), 0, dbc); err != nil {
+		if err = allowZone(zone, u.ExclName(), 0, dbc); err != nil {
 			return err
 		}
 	}
@@ -42,7 +42,7 @@ func CacheBlockedZones(blockedZones *u.Blockedzones) (err error) {
 	defer dbc.Close()
 
 	for _, zone := range CIDR {
-		if err = blockZone(zone, inclName(), 0, dbc); err != nil {
+		if err = blockZone(zone, u.InclName(), 0, dbc); err != nil {
 			return err
 		}
 	}
