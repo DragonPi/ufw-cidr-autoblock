@@ -33,55 +33,55 @@ func CacheAllowedGitHub(metaData *u.GitHub) (err error) {
 		switch reference {
 		case "hooks":
 			for _, zone := range metaData.Hooks {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "web":
 			for _, zone := range metaData.Web {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "api":
 			for _, zone := range metaData.API {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "git":
 			for _, zone := range metaData.Git {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "packages":
 			for _, zone := range metaData.Packages {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "pages":
 			for _, zone := range metaData.Pages {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "importer":
 			for _, zone := range metaData.Importer {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "actions":
 			for _, zone := range metaData.Actions {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}
 		case "dependabot":
 			for _, zone := range metaData.Dependabot {
-				if err = allowZone(zone, "GitHub-"+reference, 0, dbc); err != nil {
+				if err = allowZone(zone, "GitHub-"+reference, "No", dbc); err != nil {
 					return err
 				}
 			}

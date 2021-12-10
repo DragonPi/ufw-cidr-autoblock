@@ -25,8 +25,9 @@ import (
 )
 
 var (
-	exclgithub bool
-	update     bool
+	exclgithub   bool
+	updateRemote bool
+	updateLocal  bool
 )
 
 // applyCmd represents the apply command
@@ -55,8 +56,9 @@ func init() {
 	// and all subcommands, e.g.:
 	// applyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	applyCmd.PersistentFlags().BoolVarP(&exclgithub, "exclude-github", "", false, "exclude zones provided by GitHub API")
-	applyCmd.PersistentFlags().BoolVarP(&update, "update-zones", "", false, "update the zone files (will download/refresh zone files from internet)")
+	applyCmd.PersistentFlags().BoolVarP(&exclgithub, "exclude-github", "", false, "exclude zones provided by GitHub API from firewall")
+	applyCmd.PersistentFlags().BoolVarP(&updateRemote, "update-remote", "", false, "update the zone files (will download/refresh zone files from internet)")
+	applyCmd.PersistentFlags().BoolVarP(&updateLocal, "update-local", "", false, "update the zone files (will download/refresh zone files from internet)")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
@@ -65,7 +67,6 @@ func init() {
 
 func printApply() {
 	var (
-		countryZones   []string
 		unblockedZones []string
 		err            error
 	)
@@ -75,56 +76,24 @@ func printApply() {
 	allowedZones := u.Allowedzones{}
 	blockedZones := u.Blockedzones{}
 
-	// Write needed info in struct
-	if err = u.UnmarshallCountries(&continents); err != nil {
-		u.Error.Fatalln(err)
-	} else {
-		if err = sql.CacheCountries(&continents); err != nil {
-			u.Error.Fatalln(err.Error())
-		}
-	}
-	// Write needed info in struct
-	if err = u.UnmarshallAllowedZones(&allowedZones); err != nil {
-		u.Error.Fatalln(err)
-	} else {
-		if err = sql.CacheAllowedZones(&allowedZones); err != nil {
-			u.Error.Fatalln(err.Error())
-		}
-	}
-	// Write needed info in struct
-	if err = u.UnmarshallBlockedZones(&blockedZones); err != nil {
-		u.Error.Fatalln(err)
-	} else {
-		if err = sql.CacheBlockedZones(&blockedZones); err != nil {
-			u.Error.Fatalln(err.Error())
+	if updateLocal {
+		if err = updateJSON(&continents, &allowedZones, &blockedZones); err != nil {
+			u.Error.Fatalln(err)
 		}
 	}
 
-	countryZones = u.MakeCountryZoneArray(&continents)
+	if updateRemote {
+		if err = updateGitHub(&metaData); err != nil {
+			u.Error.Fatalln(err)
+		}
+
+		if err = updateZones(&continents); err != nil {
+			u.Error.Fatalln(err)
+		}
+	}
+
+	//////
 	unblockedZones = u.MakeCountryUnblockArray(&continents)
-
-	// Download/refresh zones from internet if requested
-	if update {
-		if err = u.DownloadGitHubIP(&metaData); err != nil {
-			// info is cached in sqlite, so we can still
-			// apply the rules but with "old" data, therefore only warn
-			u.Warning.Println(err)
-		} else {
-			// Download successful so cache it in sqlite db
-			if err = sql.CacheAllowedGitHub(&metaData); err != nil {
-				u.Error.Fatalln(err.Error())
-			}
-		}
-		if err := u.DownloadZoneFiles(countryZones); err != nil {
-			u.Warning.Println(err)
-		} else {
-			// Download successful so cache it in sqlite db
-			if err = sql.CacheZoneFiles(); err != nil {
-				u.Error.Fatalln(err.Error())
-			}
-		}
-	}
-
 	fmt.Printf("%+v\n", unblockedZones)
 	// readout json file with exclusions
 	// readout json file with inclusions
@@ -135,14 +104,68 @@ func printApply() {
 	// reload ufw
 }
 
-// appendZones adds CIDR zones to the "automatic_entries" sections of the specified json
-func appendZones(jsonFile string, section string, subsection string, data []string) (err error) {
+// updateJSON refreshes sqlite cache with the rules/countries stored in .json
+func updateJSON(continents *u.Continents, allowedZones *u.Allowedzones, blockedZones *u.Blockedzones) (err error) {
+	// Write needed info in struct
+	if err = u.UnmarshallCountries(&continents); err != nil {
+		return err
+	} else {
+		if err = sql.CacheBlockedCountries(continents); err != nil {
+			return err
+		}
+		if err = sql.CacheAllowedCountries(continents); err != nil {
+			return err
+		}
+	}
+	// Write needed info in struct
+	if err = u.UnmarshallAllowedZones(&allowedZones); err != nil {
+		return err
+	} else {
+		if err = sql.CacheAllowedZones(allowedZones); err != nil {
+			return err
+		}
+	}
+	// Write needed info in struct
+	if err = u.UnmarshallBlockedZones(&blockedZones); err != nil {
+		return err
+	} else {
+		if err = sql.CacheBlockedZones(blockedZones); err != nil {
+			return err
+		}
+	}
 
-	return
+	return nil
 }
 
-// removeZones removes CIDR zones from the "automatic_entries" sections of the specified json
-func removeZones(jsonFile string, section string, subsection string) (err error) {
+// updateGitHub refreshes sqlite cache with the data from internet (https://api.github.com/meta)
+func updateGitHub(metaData *u.GitHub) (err error) {
+	if err = u.DownloadGitHubIP(&metaData); err != nil {
+		// info is cached in sqlite, so we can still
+		// apply the rules but with "old" data, therefore only warn
+		u.Warning.Println(err)
+	} else {
+		// Download successful so cache it in sqlite db
+		if err = sql.CacheAllowedGitHub(metaData); err != nil {
+			return err
+		}
+	}
 
-	return
+	return nil
+}
+
+// updateZones downloads zone files and refreshes sqlite cache with the zone
+// files from internet (http://ipverse.net/ipblocks/data/countries/)
+func updateZones(continents *u.Continents) (err error) {
+	countryZones := u.MakeCountryZoneArray(continents)
+
+	if err = u.DownloadZoneFiles(countryZones); err != nil {
+		u.Warning.Println(err)
+	} else {
+		// Download successful so cache it in sqlite db
+		if err = sql.CacheZoneFiles(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

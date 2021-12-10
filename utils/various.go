@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-// MakeCountryZoneArray condenses all the "Zones" from the Continents struct 
+// MakeCountryZoneArray condenses all the "Zones" from the Continents struct
 // into a single array for easy iteration
 func MakeCountryZoneArray(continents *Continents) (countryZones []string) {
 	// Make a single array from all the zones with a known CIDR file
@@ -22,7 +22,7 @@ func MakeCountryZoneArray(continents *Continents) (countryZones []string) {
 	return
 }
 
-// MakeCountryUnblockArray condenses all the "Unblocked" from the Continents struct 
+// MakeCountryUnblockArray condenses all the "Unblocked" from the Continents struct
 // into a single array for easy iteration
 func MakeCountryUnblockArray(continents *Continents) (unblockedZones []string) {
 	// Make a single array from all the zones with a known CIDR file

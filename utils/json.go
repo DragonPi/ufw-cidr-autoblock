@@ -43,7 +43,7 @@ type Blockedzones struct {
 
 // unmarshallCountries reads the info from provided json file
 // and fills struct with the needed info.
-func UnmarshallCountries(continents *Continents) (err error) {
+func UnmarshallCountries(continents **Continents) (err error) {
 	var (
 		exclFile *os.File
 		body     []byte
@@ -65,7 +65,7 @@ func UnmarshallCountries(continents *Continents) (err error) {
 
 // unmarshallAllowedZones reads the info from provided json file
 // and fills struct with the needed info.
-func UnmarshallAllowedZones(allowedZones *Allowedzones) (err error) {
+func UnmarshallAllowedZones(allowedZones **Allowedzones) (err error) {
 	var (
 		exclFile *os.File
 		body     []byte
@@ -87,7 +87,7 @@ func UnmarshallAllowedZones(allowedZones *Allowedzones) (err error) {
 
 // unmarshallBlockedZones reads the info from provided json file
 // and fills struct with the needed info.
-func UnmarshallBlockedZones(blockedZones *Blockedzones) (err error) {
+func UnmarshallBlockedZones(blockedZones **Blockedzones) (err error) {
 	var (
 		exclFile *os.File
 		body     []byte

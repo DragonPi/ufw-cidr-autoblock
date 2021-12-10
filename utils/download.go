@@ -52,7 +52,7 @@ type GH_ssh_fp struct {
 }
 
 // DownloadGithubIP fetches the CIDR zones from the GitHub API, meta endpoint
-func DownloadGitHubIP(metaData *GitHub) (err error) {
+func DownloadGitHubIP(metaData **GitHub) (err error) {
 	var (
 		req  *http.Request
 		res  *http.Response

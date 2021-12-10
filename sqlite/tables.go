@@ -41,7 +41,7 @@ func createBlockedzonesTable(verbose bool, dbc *sql.DB) (err error) {
 		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
 		"zone" TEXT,
 		"reference" TEXT,
-		"manual" INTEGER,
+		"manual" TEXT,
 		UNIQUE(zone)
 	  );`
 
@@ -67,7 +67,7 @@ func createAllowedzonesTable(verbose bool, dbc *sql.DB) (err error) {
 		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
 		"zone" TEXT,
 		"reference" TEXT,
-		"manual" INTEGER,
+		"manual" TEXT,
 		UNIQUE(zone)
   	);`
 
@@ -93,7 +93,7 @@ func createBlockedcountriesTable(verbose bool, dbc *sql.DB) (err error) {
 		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
 		"country" TEXT,
 		"country_long" TEXT,
-		"manual" INTEGER,
+		"manual" TEXT,
 		UNIQUE(country)
   	);`
 
@@ -119,7 +119,7 @@ func createAllowedcountriesTable(verbose bool, dbc *sql.DB) (err error) {
 		"id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
 		"country" TEXT,
 		"country_long" TEXT,
-		"manual" INTEGER,
+		"manual" TEXT,
 		UNIQUE(country)
   	);`
 
